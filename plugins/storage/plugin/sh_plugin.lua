@@ -6,6 +6,26 @@ Clockwork.kernel:IncludePrefixed("sv_plugin.lua")
 Clockwork.kernel:IncludePrefixed("sv_hooks.lua")
 Clockwork.kernel:IncludePrefixed("cl_hooks.lua")
 
+-- A function to get a unique key for a container.
+-- This is used to save/retrieve passwords per container per character.
+-- Uses a persistent unique ID stored on the entity.
+function cwStorage:GetContainerKey(entity)
+	if not IsValid(entity) then return nil end
+	
+	-- Use the container's unique ID if it has one
+	if entity.cwContainerUID then
+		return entity.cwContainerUID
+	end
+	
+	return nil
+end
+
+-- A function to generate a unique ID for a container.
+-- Called when a password is first set on a container.
+function cwStorage:GenerateContainerUID()
+	return "container_" .. os.time() .. "_" .. math.random(100000, 999999)
+end
+
 cwStorage.containerList = {
 	["models/props_wasteland/controlroom_storagecloset001a.mdl"] = {8, "Closet"},
 	["models/props_wasteland/controlroom_storagecloset001b.mdl"] = {15, "Closet"},

@@ -64,7 +64,15 @@ function cwStorage:EntityHandleMenuOption(player, entity, option, arguments)
 				   (timeSinceLastUse > 2592000 and not entity.cwPasswordUsed) then
 					self:OpenContainer(player, entity, containerWeight)
 				else
-					Clockwork.datastream:Start(player, "ContainerPassword", entity)
+					-- Get saved password for this container if player has one
+					local containerKey = self:GetContainerKey(entity)
+					local savedPasswords = player:GetCharacterData("SavedContainerPasswords") or {}
+					local savedPassword = savedPasswords[containerKey] or ""
+					
+					Clockwork.datastream:Start(player, "ContainerPassword", {
+						entity = entity,
+						savedPassword = savedPassword
+					})
 				end
 			end
 		end

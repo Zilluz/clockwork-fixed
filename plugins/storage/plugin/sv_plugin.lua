@@ -15,6 +15,19 @@ Clockwork.datastream:Hook("ContainerPassword", function(player, data)
 				entity.cwLastPasswordTime = CurTime()
 				-- Password used
 				
+				-- Generate a unique ID for this container if it doesn't have one
+				if not entity.cwContainerUID then
+					entity.cwContainerUID = cwStorage:GenerateContainerUID()
+				end
+				
+				-- Save the correct password for this player's character
+				local containerKey = cwStorage:GetContainerKey(entity)
+				if containerKey then
+					local savedPasswords = player:GetCharacterData("SavedContainerPasswords") or {}
+					savedPasswords[containerKey] = password
+					player:SetCharacterData("SavedContainerPasswords", savedPasswords)
+				end
+				
 				-- Function to reset password removal timer
 				local function resetPasswordTimer()
 					-- Cancel existing timer if it exists
@@ -122,6 +135,7 @@ function cwStorage:SaveStorage()
 					position = v:GetPos(),
 					message = v.cwMessage,
 					password = v.cwPassword,
+					containerUID = v.cwContainerUID,
 					startPos = startPos,
 					inventory = Clockwork.inventory:ToSaveable(v.cwInventory),
 					bNoCollision = bNoCollision,
@@ -179,6 +193,7 @@ function cwStorage:LoadStorage()
 		self.storage[entity] = entity
 		entity.cwInventory = Clockwork.inventory:ToLoadable(v.inventory)
 		entity.cwPassword = v.password
+		entity.cwContainerUID = v.containerUID
 		entity.cwMessage = v.message
 		entity.cwCash = v.cash
 		entity.cwIsLootable = v.isLootable

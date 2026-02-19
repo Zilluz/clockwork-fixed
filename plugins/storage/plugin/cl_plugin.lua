@@ -9,9 +9,10 @@ Clockwork.datastream:Hook("StorageMessage", function(data)
 end)
 
 Clockwork.datastream:Hook("ContainerPassword", function(data)
-	local entity = data
+	local entity = data.entity
+	local savedPassword = data.savedPassword or ""
 
-	Derma_StringRequest("Password", "What is the password for this container?", nil, function(text)
+	Derma_StringRequest("Password", "What is the password for this container?", savedPassword, function(text)
 		Clockwork.datastream:Start("ContainerPassword", {text, entity})
 	end)
 end)
